@@ -1,0 +1,26 @@
+version: '3.6'
+services:
+  ifw:
+    container_name: ifw
+    image: ifw
+    build: .
+    environment:
+      JWT: ${JWT}
+    ports:
+      - '4173:3000'
+  ifs:
+    container_name: ifs
+    image: ifs
+    build: server
+    command: "npm run dev"
+    ports:
+      - '7000:6000'
+    environment:
+      NODE_OPTIONS: "--es-module-specifier-resolution=node --experimental-modules --loader ./loader.js --openssl-legacy-provider"
+      NODE_ENV: development
+    volumes:
+      - ./server:/app
+networks: 
+  default: 
+    name: net
+    external: true

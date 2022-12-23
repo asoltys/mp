@@ -1,0 +1,40 @@
+{
+  "name": "liquid-paper",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "prettier --plugin-search-dir . --check .",
+    "format": "prettier --plugin-search-dir . --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "1.0.0-next.102",
+    "@sveltejs/kit": "1.0.0-next.581",
+    "bip32": "^3.1.0",
+    "bip38": "^3.1.1",
+    "bip39": "^3.0.4",
+    "buffer": "^6.0.3",
+    "ecpair": "^2.1.0",
+    "liquidjs-lib": "6.0.2-liquid.23",
+    "prettier": "^2.8.1",
+    "prettier-plugin-svelte": "^2.9.0",
+    "qrcode-base64": "^1.0.1",
+    "rollup": "^2.79.1",
+    "svelte": "^3.54.0",
+    "tiny-secp256k1": "^2.2.1",
+    "vite": "^4.0.0",
+    "vite-plugin-node-polyfills": "^0.5.0",
+    "vite-plugin-top-level-await": "^1.2.2",
+    "vite-plugin-wasm": "^3.1.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "vite"
+      ]
+    }
+  },
+  "type": "module"
+}
