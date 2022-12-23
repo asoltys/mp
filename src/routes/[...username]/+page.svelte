@@ -8,70 +8,118 @@
 	import { onMount } from 'svelte';
 	import Qr from 'qrcode-base64';
 	import { payments, networks } from 'liquidjs-lib';
-  console.log(Qr);
+	import bip38 from 'bip38';
+	import 'setimmediate';
 
 	export let data;
 
-	let address, index, pubkey, bip32, mnemonic, key, password, seed, privkey, encrypted;
+	let address,
+		index,
+		bip32,
+		mnemonic,
+		key,
+		password,
+		seed,
+		privkey,
+		display,
+		encrypted,
+		encrypting,
+		addrQr,
+		privQr;
 
 	let loaded;
 
-	onMount(async () => {
+	let generate = async () => {
 		bip32 = await BIP32Factory(ecc);
 		mnemonic = generateMnemonic();
 		seed = mnemonicToSeedSync(mnemonic);
-		key = bip32.fromSeed(seed);
-		pubkey = key.derivePath("m/49'/1'/0'/0").neutered().toBase58();
+		key = bip32.fromSeed(seed).derivePath("m/49'/1'/0'/0/0");
 		privkey = key.toWIF();
 
 		({ address } = payments.p2wpkh({
 			pubkey: key.publicKey
 		}));
-		loaded = true;
-	});
 
-	let submit = async () => {
-		encrypted = bip38.encrypt(key.privateKey, decoded.compressed, password);
+		addrQr = Qr.drawImg(address, { size: 300 });
+		privQr = Qr.drawImg(privkey, { size: 300 });
+		loaded = true;
 	};
 
-	// $: addrQr = Qr.drawImg(address);
-	// $: privkeyQr = Qr.drawImg(encrypted || privkey);
+	let encrypt = async () => {
+		encrypting = true;
+		encrypted = await bip38.encryptAsync(key.privateKey, true, password);
+		privQr = Qr.drawImg(encrypted, { size: 300 });
+		encrypting = false;
+		display = true;
+	};
+
+	let progress = (status) => {
+		console.log(status);
+	};
 </script>
 
 <main>
 	<div class="container">
 		<h1 class="header">Liquid Paper Wallet</h1>
 
-		<p>Address</p>
-		<div style="display: flex">
-			<p style="margin: auto"><b>{address}</b></p>
-		</div>
-		<img src={addrQr} />
+		{#if mnemonic}
+			<p>Address</p>
 
-		<p>{encrypted ? 'Encrypted' : ''} Private Key</p>
-		<div style="display: flex">
-			<p style="margin: auto"><b>{encrypted || privkey}</b></p>
-		</div>
-		<img src={privkeyQr} />
-
-		<div style="display: flex; flex-wrap: wrap">
-			<form on:submit|preventDefault={submit} style="text-align: center; margin: auto">
-				<div style="margin: 10px 0">
-					<input name="password" placeholder="Password" bind:value={password} autofocus />
-				</div>
-				<button type="submit">Yes</button>
-			</form>
-
-			<div style="width: 300px; height: 400px; padding: 40px 20px; margin: auto">
-				<img
-					src="/caballero.webp"
-					alt="Caballero"
-					in:fly={{ x: -20, duration: 400 }}
-					style="width: 100%"
-				/>
-				<p in:fade>Want to encrypt your private key, amigo?</p>
+			<div style="display: flex">
+				<p style="margin: auto"><b>{address}</b></p>
 			</div>
-		</div>
+
+			<div style="display: flex">
+				<img src={addrQr} style="margin: 20px auto" />
+			</div>
+
+			{#if encrypting}
+				<div style="display: flex">
+					<img src="/stevus.webp" style="margin: 20px auto; width: 200px" />
+				</div>
+			{/if}
+
+			{#if display}
+				<p>{encrypting ? 'Encrypting' : encrypted ? 'Encrypted' : ''} Private Key</p>
+				<div style="display: flex">
+					<p style="margin: auto"><b>{encrypted || privkey}</b></p>
+				</div>
+
+				<div style="display: flex">
+					<img src={privQr} style="margin: 20px auto" />
+				</div>
+			{/if}
+		{/if}
+
+		{#if !(encrypting || display)}
+			<div style="display: flex; flex-wrap: wrap">
+				{#if mnemonic}
+					<form on:submit|preventDefault={encrypt} style="text-align: center; margin: auto">
+						<div style="margin: 10px 0">
+							<input name="password" placeholder="Password" bind:value={password} autofocus />
+						</div>
+						<button type="button" class="no" on:click={() => (display = true)}>No</button>
+						<button type="submit">Yes</button>
+					</form>
+				{:else}
+					<form on:submit|preventDefault={generate} style="text-align: center; margin: auto">
+						<button type="submit">Yes</button>
+					</form>
+				{/if}
+
+				<div style="width: 300px; height: 400px; padding: 40px 20px; margin: auto">
+					<img
+						src="/caballero.webp"
+						alt="Caballero"
+						in:fly={{ x: -20, duration: 400 }}
+						style="width: 100%"
+					/>
+					<p in:fade>
+						{mnemonic ? 'Want to encrypt your private key, amigo?' : 'Ready to begin, amigo?'}
+					</p>
+				</div>
+			</div>
+		{/if}
 	</div>
 </main>
 
@@ -96,14 +144,14 @@
 		border-radius: 2em;
 		border: 1px solid black;
 		font-family: Montserrat, sans-serif;
-		width: 300px;
 		margin: auto;
+		width: 300px;
 	}
 
 	button {
 		background: #a0ada4;
 		color: white;
-		width: 320px;
+		width: 180px;
 	}
 
 	.container {
