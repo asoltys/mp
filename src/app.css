@@ -1,0 +1,57 @@
+	body {
+		background: white;
+		color: black;
+		font-family: Montserrat, sans-serif;
+	}
+
+	input,
+	button {
+		padding: 10px;
+		border-radius: 2em;
+		border: 1px solid black;
+		font-family: Montserrat, sans-serif;
+		margin: 6px auto;
+		width: 300px;
+	}
+
+	button {
+		background: #a0ada4;
+		color: white;
+		width: 180px;
+	}
+
+	.container {
+		word-wrap: break-word;
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	h1 {
+		font-family: 'Montserrat', sans-serif;
+		font-size: 2.5em;
+		padding-bottom: 28px;
+		position: relative;
+	}
+
+	.header:after {
+		display: block;
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 34px;
+		height: 7px;
+		background-color: #a0ada4;
+	}
+
+	.invisible {
+		visibility: hidden;
+	}
+
+	main {
+		padding: 30px;
+	}
+
+	button.no {
+		background: #99667c;
+	}
